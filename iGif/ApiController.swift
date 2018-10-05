@@ -25,26 +25,29 @@ import RxSwift
 import SwiftyJSON
 
 class ApiController {
-  
-  static let shared = ApiController()
-  
-  // R7NBPjEnYf1UUsqybg8RvhvXHZJzzOg1
-  private let apiKey = "R7NBPjEnYf1UUsqybg8RvhvXHZJzzOg1"
-  
-  func search(text: String) -> Observable<[JSON]> {
-    let url = URL(string: "http://api.giphy.com/v1/gifs/search")!
-    var request = URLRequest(url: url)
-    let keyQueryItem = URLQueryItem(name: "api_key", value: apiKey)
-    let searchQueryItem = URLQueryItem(name: "q", value: text)
-    let urlComponents = NSURLComponents(url: url, resolvingAgainstBaseURL: true)!
     
-    urlComponents.queryItems = [searchQueryItem, keyQueryItem]
+    static let shared = ApiController()
     
-    request.url = urlComponents.url!
-    request.httpMethod = "GET"
+    // R7NBPjEnYf1UUsqybg8RvhvXHZJzzOg1
+    private let apiKey = "R7NBPjEnYf1UUsqybg8RvhvXHZJzzOg1"
     
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    func search(text: String) -> Observable<[JSON]> {
+        let url = URL(string: "http://api.giphy.com/v1/gifs/search")!
+        var request = URLRequest(url: url)
+        let keyQueryItem = URLQueryItem(name: "api_key", value: apiKey)
+        let searchQueryItem = URLQueryItem(name: "q", value: text)
+        let urlComponents = NSURLComponents(url: url, resolvingAgainstBaseURL: true)!
+        
+        urlComponents.queryItems = [searchQueryItem, keyQueryItem]
+        
+        request.url = urlComponents.url!
+        request.httpMethod = "GET"
+        
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        return URLSession.shared
+            .rx.json(request: request)
+            .map { $0["data"].array ?? [] }
+    }
     
-    return Observable.just([])
-  }
 }
